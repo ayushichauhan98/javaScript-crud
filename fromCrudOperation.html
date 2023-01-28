@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      /* .table {
+        display: none;
+      } */
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="col-sm-4 mx-auto m-4">
+        <!-- <input type="hidden" id="index" /> -->
+        <input
+          type="text"
+          id="name"
+          placeholder="Enter Your name...."
+          class="form-control mb-3"
+        />
+        <input
+          type="Number"
+          placeholder="Enter Your number.."
+          class="form-control mb-3"
+          id="mobile"
+        />
+        <input
+          type="email"
+          placeholder="Enter Your email.."
+          class="form-control mb-3"
+          id="email"
+        />
+        <input
+          type="text"
+          placeholder="Enter Your city.."
+          class="form-control mb-3"
+          id="city"
+        />
+        <input type="file" class="form-control mb-3" id="file" />
+        <img src="" id="im" height="80px" width="100px" />
+        <input
+          class="btn btn-outline-success"
+          value="Save"
+          id="btn"
+          onclick="saveData()"
+        />
+      </div>
+      <div class="table"></div>
+    </div>
+
+    <script>
+      var records = [];
+      var Name = $("#name");
+      var email = $("#email");
+      var mobile = $("#mobile");
+      var city = $("#city");
+      var btn = $("#btn");
+      function saveData() {
+        // var keys = ["Name", "Email", "Mobile", "City", "File"];
+        let file = $("#file").value.split("\\").pop();
+        if (
+          Name.value != "" &&
+          mobile.value != "" &&
+          email.value != "" &&
+          city.value != ""
+        ) {
+          if (btn.value == "Save") {
+            records.push({
+              Name: Name.value,
+              Mobile: mobile.value,
+              Email: email.value,
+              File: file,
+              City: city.value,
+            });
+          } else {
+            // let edit_index = $("#index").value;
+            records[edit_index].Name = Name.value;
+            records[edit_index].Email = email.value;
+            records[edit_index].Mobile = mobile.value;
+            records[edit_index].City = city.value;
+            records[edit_index].File = file;
+            $("#im").src = "";
+            btn.value = "Save";
+          }
+        } else {
+          alert("Please fill all field..");
+        }
+        Name.value = "";
+        email.value = "";
+        city.value = "";
+        mobile.value = "";
+        $("#file").value = "";
+        showData();
+      }
+      function showData() {
+        var res =
+          "<table class='table table-hover' border='1' ><tr class='text-bg-dark'><th>Sr no</th><th>Name</th><th>Mobile</th><th>Email</th><th>City</th><th>Picture</th><th>Edit</th><th>Delete</th></tr>";
+        records.forEach((data, index) => {
+          res += `
+                    <tr>
+                    <td>${index + 1}</td>    
+                    <td>${data.Name}</td>    
+                    <td>${data.Mobile}</td>    
+                    <td>${data.Email}</td>    
+                    <td>${data.City}</td>    
+                    <td><img src="img/${
+                      data.File
+                    }" height="50px" width="100px" /></td>  
+                    <td><button onclick='edit(this)' class='btn btn-outline-success'>Edit</button></td>    
+                    <td><button onclick='remove(this)' class='btn btn-outline-danger'>Delete</button</td>    
+                    </tr>
+                `;
+        });
+        res += "</table>";
+        $(".table").innerHTML = res;
+        // $(".table").style.display = "block";
+      }
+      function remove(x) {
+        var del_index =
+          x.parentElement.parentElement.firstElementChild.innerText - 1;
+        if (confirm("do You want to delete records !")) {
+          records.splice(del_index, 1);
+        }
+        showData();
+      }
+
+      function edit(x) {
+        edit_index =
+          x.parentElement.parentElement.firstElementChild.innerText - 1;
+        $("#btn").value = "Update";
+        Name.value = records[edit_index].Name;
+        email.value = records[edit_index].Email;
+        mobile.value = records[edit_index].Mobile;
+        city.value = records[edit_index].City;
+        $("#im").src = `img/${records[edit_index].File}`;
+        // $("#index").value = edit_index;
+      }
+
+      function $(element) {
+        return document.querySelector(element);
+      }
+    </script>
+  </body>
+</html>

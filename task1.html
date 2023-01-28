@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product data</title>
+    <style>
+      .outer {
+        display: flex;
+        justify-content: space-around;
+      }
+      h1 {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Product Data</h1>
+    <hr />
+    <div class="outer">
+      <div>
+        <form onsubmit="register()">
+          Product_id <br />
+          <input type="number" id="Product_id" disabled readonly value="1001" />
+          <input type="hidden" name="index" id="index" />
+          <br />
+          Product Name <br />
+          <input type="text" id="pname" name="name" /><br />
+          Product Description <br />
+          <input type="text" id="desp" name="description" /> <br />
+          Total Price <br />
+          <input type="text" id="price" name="price" /> <br />
+          Upload Image <br />
+          <input
+            type="file"
+            name="file"
+            id="file"
+            onchange="uploadimg(this)"
+          /><br />
+          Date <br />
+          <input type="datetime-local" name="date" id="date" /> <br />
+          <input
+            type="button"
+            value="update"
+            id="update"
+            onclick="updatedetails()"
+            style="display: none"
+          />
+          <input type="submit" value="Submit" id="submit" />
+        </form>
+      </div>
+
+      <div>
+        <table border="1" rules="all" cellpadding="8">
+          <!--Rules  = all,none,rows,cols--->
+          <thead>
+            <th>SR No.</th>
+            <th>Product_id</th>
+            <th>Product_Name</th>
+            <th>Product_description</th>
+            <th>Total_Price</th>
+            <th>Images</th>
+            <th>Date</th>
+            <th>Delete | Edit</th>
+          </thead>
+          <tbody id="table_data"></tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+  <script>
+    var product_id = 1001;
+    let collections =
+      JSON.parse(window.localStorage.getItem("product_data")) || [];
+    let products = {};
+    let inputs = ["#Product_id", "#pname", "#desp", "#price", "#date"];
+    let keys = [
+      "Product_id",
+      "Product_Name",
+      "Product_description",
+      "Product_price",
+      "Date",
+    ];
+    (() => {
+      set_id();
+      table();
+    })();
+
+    function register() {
+      inputs.forEach((items, index) => {
+        if (index == 0) {
+          products[keys[index]] = generate_id(collections);
+        } else {
+          products[keys[index]] = $(items).value;
+        }
+      });
+      collections.push(products);
+      window.localStorage.setItem("product_data", JSON.stringify(collections));
+
+      inputs.forEach((item, index) => {
+        $(item).value = "";
+      });
+      set_id();
+      table();
+    }
+
+    function generate_id(collections) {
+      if (collections.length > 0) {
+        let max_length = collections.length - 1;
+        return ($("#Product_id").value =
+          Number(collections[max_length].Product_id) + 1);
+      }
+      return product_id;
+    }
+
+    function set_id() {
+      if (collections.length > 0) {
+        let max_length = collections.length - 1;
+        $("#Product_id").value = Number(collections[max_length].Product_id) + 1;
+      } else {
+        $("#Product_id").value = product_id;
+      }
+    }
+    // console.log(collections);
+    // biding data in table
+    function table() {
+      var product = "";
+      //   console.log(collections);
+      collections.forEach((data, index) => {
+        let sr_no = Number(index) + 1;
+        product += `
+            <tr>
+            <td>${sr_no}</td>
+            <td>${data.Product_id}</td>
+            <td>${data.Product_Name}</td>
+            <td>${data.Product_description}</td>
+            <td>${data.Product_price}</td>
+            <td><img src = "${data.pic}" height="50px" width="50px" /></td>
+            <td>${data.Date}</td>
+            <td><a href="javascript:handleDelete(${index});">Delete</a> &nbsp;<a href="javascript:editData(${index})">Edit</a></td>
+            </tr>
+            `;
+      });
+      $("#table_data").innerHTML = product;
+    }
+
+    function handleDelete(index) {
+      if (window.confirm("Do you want to delete")) {
+        // console.log(index);
+        collections.splice(index, 1);
+        window.localStorage.setItem(
+          "product_data",
+          JSON.stringify(collections)
+        );
+        table();
+      }
+    }
+
+    function $(element) {
+      return document.querySelector(element);
+    }
+
+    function uploadimg(object) {
+      var reader = new FileReader();
+      reader.addEventListener("load", function () {
+        products["pic"] = reader.result;
+      });
+      reader.readAsDataURL(object.files[0]);
+    }
+    function editData(index) {
+      let currentUser = collections[index];
+
+      inputs.forEach((item, ind) => {
+        $(item).value = currentUser[keys[ind]];
+      });
+      $("#index").value = index;
+      $("#submit").style.display = "none";
+      $("#update").style.display = "block";
+    }
+    function updatedetails() {
+      let index = $("#index").value;
+      collections[index].Product_Name = $("#pname").value;
+      collections[index].Product_description = $("#desp").value;
+      collections[index].Product_price = $("#price").value;
+      collections[index].Date = $("#date").value;
+      console.log(collections[index]);
+      window.localStorage.setItem("product_data", JSON.stringify(collections));
+      window.location.reload();
+    }
+  </script>
+</html>
